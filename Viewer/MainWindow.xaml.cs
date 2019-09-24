@@ -1,6 +1,8 @@
-﻿using System;
+﻿using Microsoft.VisualBasic.FileIO;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -51,7 +53,7 @@ namespace Viewer {
             this.Height = Properties.Settings.Default.Height;
             this.Width = Properties.Settings.Default.Width;
             this.Metadata.Visibility = Properties.Settings.Default.MetadataVisible ? Visibility.Visible : Visibility.Hidden;
-            this.CustomContextMenuItems = null;
+            BuildContextMenu(null);
 
             if (this.Top < 0) {
                 this.Top = 0;
@@ -218,6 +220,30 @@ namespace Viewer {
             if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.Tab) {
                 ToggleMetadata();
             }
+        }
+
+        private void ContextMenu_ShowInExplorer(object sender, RoutedEventArgs e) {
+            var proc = new Process();
+            proc.StartInfo.FileName = "explorer.exe";
+            proc.StartInfo.Arguments = string.Format("/select,\"{0}\"", this.viewModel.CurrentImage);
+            proc.Start();
+        }
+
+        private void ContextMenu_Delete(object sender, RoutedEventArgs e) {
+            // this doesn't work currently because the image is still loaded and the file handle is still held!
+            var response = MessageBox.Show("Are you sure you want to move this file to the Recycle Bin?", "Confirm file deletion", MessageBoxButton.YesNo);
+            if (response == MessageBoxResult.Yes) {
+                var currentImage = this.viewModel.CurrentImage;
+                FileSystem.DeleteFile(currentImage, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
+
+                this.viewModel.Images.Remove(currentImage);
+                // this refreshes the view model; maybe we should have to call a ViewModel.RemoveImage instead?
+                this.viewModel.CurrentImageIndex = this.viewModel.CurrentImageIndex; 
+            }
+        }
+
+        private void ContextMenu_Exit(object sender, RoutedEventArgs e) {
+            this.Close();
         }
     }
 }

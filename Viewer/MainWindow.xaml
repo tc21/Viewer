@@ -19,11 +19,11 @@
         >
     <Window.Resources>
         <x:Array Type="{x:Type sys:Object}" x:Key="UpperContextMenu">
-            <MenuItem Header="Show in Explorer" />
+            <MenuItem Header="Show in Explorer" Click="ContextMenu_ShowInExplorer" />
         </x:Array>
         <x:Array Type="{x:Type sys:Object}" x:Key="LowerContextMenu">
-            <MenuItem Header="Delete" />
-            <MenuItem Header="Exit" />
+            <MenuItem Header="Delete" Click="ContextMenu_Delete" IsEnabled="False" />
+            <MenuItem Header="Exit" Click="ContextMenu_Exit" />
         </x:Array>
 
         <Style x:Key="DropShadowLabel" TargetType="TextBlock">
