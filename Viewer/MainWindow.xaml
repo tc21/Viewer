@@ -2,11 +2,30 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:p="clr-namespace:Viewer.Properties"
+        xmlns:sys="clr-namespace:System;assembly=mscorlib"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Viewer"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        Title="Viewer"
+        Background="DarkGray"
+        AllowDrop="True"
+        Drop="Window_Drop"
+        MouseWheel="Window_MouseWheel"
+        Closing="Window_Closing"
+        MouseLeftButtonUp="Window_MouseUp"
+        KeyDown="Window_KeyDown">
+    <Window.Resources>
+        <x:Array Type="{x:Type sys:Object}" x:Key="UpperContextMenu">
+            <MenuItem Header="Show in Explorer" />
+        </x:Array>
+        <x:Array Type="{x:Type sys:Object}" x:Key="LowerContextMenu">
+            <MenuItem Header="Delete" />
+            <MenuItem Header="Exit" />
+        </x:Array>
+    </Window.Resources>
+    
     <Grid>
-        
+        <Image x:Name="MainImage" RenderOptions.BitmapScalingMode="HighQuality"/>
     </Grid>
 </Window>

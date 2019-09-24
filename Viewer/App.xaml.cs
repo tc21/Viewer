@@ -13,5 +13,16 @@ namespace Viewer
     /// </summary>
     public partial class App : Application
     {
+        private void Application_Startup(object sender, StartupEventArgs e)
+        {
+            // Pass e.Args to MainWindow
+            MainWindow mainWindow = new MainWindow(e.Args);
+            mainWindow.Show();
+        }
+
+        private void Application_Exit(object sender, ExitEventArgs e)
+        {
+            Viewer.Properties.Settings.Default.Save();
+        }
     }
 }
