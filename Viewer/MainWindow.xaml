@@ -7,7 +7,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Viewer"
         mc:Ignorable="d"
-        Title="Viewer"
+        Title="{Binding Title}"
         Background="DarkGray"
         AllowDrop="True"
         Drop="Window_Drop"
@@ -26,6 +26,6 @@
     </Window.Resources>
     
     <Grid>
-        <Image x:Name="MainImage" RenderOptions.BitmapScalingMode="HighQuality"/>
+        <Image x:Name="MainImage" Source="{Binding CurrentImageSource}" RenderOptions.BitmapScalingMode="HighQuality"/>
     </Grid>
 </Window>
