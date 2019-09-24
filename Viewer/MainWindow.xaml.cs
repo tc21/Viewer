@@ -77,13 +77,20 @@ namespace Viewer {
             if (paths.Count() == 1) {
                 var path = paths.First();
                 if (Directory.Exists(path)) {  // "file" is actually a directory!
-                    this.viewModel.LoadImages(Directory.GetFiles(path));
+                    this.viewModel.LoadImages(new DirectoryInfo(path).GetFilesInNaturalOrder());
                 } else {
                     // we don't just load one file, but load the containing directory and navigate to this file.
-                    var directoryName = Path.GetDirectoryName(path);
-                    var directoryFiles = Directory.GetFiles(directoryName);
+                    var fileInfo = new FileInfo(path);
+                    var directoryName = fileInfo.DirectoryName;
+                    var directoryFiles = new DirectoryInfo(directoryName).GetFilesInNaturalOrder();
+
                     this.viewModel.LoadImages(directoryFiles);
-                    this.viewModel.CurrentImageIndex = this.viewModel.Images.IndexOf(path);
+
+                    for (var i = 0; i < this.viewModel.Images.Count; i++) {
+                        if (this.viewModel.Images[i] == fileInfo.FullName) {
+                            this.viewModel.CurrentImageIndex = i;
+                        }
+                    }
                 }
             } else {
                 this.viewModel.LoadImages(paths);

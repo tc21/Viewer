@@ -68,6 +68,7 @@ namespace Viewer {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
+        // If you use this, it is your responsibility to ensure all paths are valid
         public void LoadImages(IEnumerable<string> files) {
             var images = new List<string>();
 
@@ -78,6 +79,10 @@ namespace Viewer {
             }
 
             Images = images;
+        }
+
+        public void LoadImages(IEnumerable<FileInfo> files) {
+            LoadImages(files.Select(e => e.FullName));
         }
 
         private int ActualIndex(int index) {
