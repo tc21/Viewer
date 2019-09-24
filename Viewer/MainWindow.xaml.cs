@@ -44,32 +44,65 @@ namespace Viewer {
             InitializeComponent();
 
             this.DataContext = this.viewModel;
+            this.viewModel.PropertyChanged += this.ViewModel_PropertyChanged;
 
-            Top = Properties.Settings.Default.Top;
-            Left = Properties.Settings.Default.Left;
-            Height = Properties.Settings.Default.Height;
-            Width = Properties.Settings.Default.Width;
-            CustomContextMenuItems = null;
+            this.Top = Properties.Settings.Default.Top;
+            this.Left = Properties.Settings.Default.Left;
+            this.Height = Properties.Settings.Default.Height;
+            this.Width = Properties.Settings.Default.Width;
+            this.Metadata.Visibility = Properties.Settings.Default.MetadataVisible ? Visibility.Visible : Visibility.Hidden;
+            this.CustomContextMenuItems = null;
 
-            if (Top < 0) {
-                Top = 0;
+            if (this.Top < 0) {
+                this.Top = 0;
             }
 
-            if (Left < 0) {
-                Left = 0;
+            if (this.Left < 0) {
+                this.Left = 0;
             }
 
             // args come from App, which is the command line arguments
             this.viewModel.LoadImages(files);
         }
 
+        private void ViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e) {
+            if (e.PropertyName == nameof(this.viewModel.CurrentImage)) {
+                if (this.Metadata.Visibility == Visibility.Visible) {
+                    var info = new FileInfo(this.viewModel.CurrentImage);
+                    var metadata = this.viewModel.CurrentImageMetadata;
+
+                    this.ImageSizeIndicator.Text = string.Format("File size: {0} bytes", info.Length);
+                    this.ImageLastModifiedIndicator.Text = string.Format("Last modified: {0}", info.LastWriteTime);
+
+                    try {
+                        this.ImageDimensionsIndicator.Text = string.Format("Dimensions: {0}x{1}", this.viewModel.CurrentImageSource.PixelWidth, this.viewModel.CurrentImageSource.PixelHeight);
+                    } catch (NotSupportedException) {
+                        this.ImageDimensionsIndicator.Text = "This image could not be loaded";
+                    }
+
+                    if (metadata != null) {
+                        try {
+                            this.ImageMetadataIndicator.Text = string.Format(
+                                "Metadata: {0}, {1}, {2} {3}, {4}",
+                                metadata.Format, metadata.DateTaken, metadata.CameraManufacturer, metadata.CameraModel, metadata.ApplicationName
+                            );
+                        } catch (NotSupportedException) {
+                            this.ImageMetadataIndicator.Text = string.Format("Metadata: {0}", metadata.Format);
+                        }
+                    } else {
+                        this.ImageMetadataIndicator.Text = "";
+                    }
+                }
+            }
+        }
+
         /* returns whether the index actually exists */
         public bool GoToIndex(int index) {
-            if (!(0 <= index && index < viewModel.Images.Count)) {
+            if (!(0 <= index && index < this.viewModel.Images.Count)) {
                 return false;
             }
 
-            viewModel.CurrentImageIndex = index;
+            this.viewModel.CurrentImageIndex = index;
             return true;
         }
 
@@ -126,6 +159,14 @@ namespace Viewer {
             }
         }
 
+        private void ToggleMetadata() {
+            if (this.Metadata.Visibility == Visibility.Visible) {
+                this.Metadata.Visibility = Visibility.Hidden;
+            } else {
+                this.Metadata.Visibility = Visibility.Visible;
+            }
+        }
+
         private void Window_Drop(object sender, DragEventArgs e) {
             if (e.Data.GetDataPresent(DataFormats.FileDrop)) {
                 var files = (string[])e.Data.GetData(DataFormats.FileDrop);
@@ -142,7 +183,7 @@ namespace Viewer {
         }
 
         private void Window_Closing(object sender, CancelEventArgs e) {
-            if (WindowState == WindowState.Maximized) {
+            if (this.WindowState == WindowState.Maximized) {
                 Properties.Settings.Default.Top = RestoreBounds.Top;
                 Properties.Settings.Default.Left = RestoreBounds.Left;
                 Properties.Settings.Default.Height = RestoreBounds.Height;
@@ -153,6 +194,8 @@ namespace Viewer {
                 Properties.Settings.Default.Height = Height;
                 Properties.Settings.Default.Width = Width;
             }
+
+            Properties.Settings.Default.MetadataVisible = this.Metadata.Visibility == Visibility.Visible;
         }
 
         private void Window_MouseUp(object sender, MouseButtonEventArgs e) {
@@ -160,11 +203,20 @@ namespace Viewer {
         }
 
         private void Window_KeyDown(object sender, KeyEventArgs e) {
+            // navigation 
             if (e.Key == Key.Right || e.Key == Key.Down) {
                 this.viewModel.CurrentImageIndex += 1;
             }
+
             if (e.Key == Key.Left || e.Key == Key.Up) {
                 this.viewModel.CurrentImageIndex -= 1;
+            }
+        }
+
+        private void Window_KeyUp(object sender, KeyEventArgs e) {
+            // quick and dirty; figure out how to use Window.InputBindings instead
+            if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.Tab) {
+                ToggleMetadata();
             }
         }
     }

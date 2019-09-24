@@ -14,7 +14,9 @@
         MouseWheel="Window_MouseWheel"
         Closing="Window_Closing"
         MouseLeftButtonUp="Window_MouseUp"
-        KeyDown="Window_KeyDown">
+        KeyDown="Window_KeyDown"
+        KeyUp="Window_KeyUp"
+        >
     <Window.Resources>
         <x:Array Type="{x:Type sys:Object}" x:Key="UpperContextMenu">
             <MenuItem Header="Show in Explorer" />
@@ -23,9 +25,28 @@
             <MenuItem Header="Delete" />
             <MenuItem Header="Exit" />
         </x:Array>
+
+        <Style x:Key="DropShadowLabel" TargetType="TextBlock">
+            <Style.Setters>
+                <Setter Property="Foreground" Value="White" />
+                <Setter Property="Effect">
+                    <Setter.Value>
+                        <DropShadowEffect BlurRadius="5" ShadowDepth="0" Opacity="1" />
+                    </Setter.Value>
+                </Setter>
+            </Style.Setters>
+
+        </Style>
     </Window.Resources>
-    
+
     <Grid>
         <Image x:Name="MainImage" Source="{Binding CurrentImageSource}" RenderOptions.BitmapScalingMode="HighQuality"/>
+        
+        <StackPanel x:Name="Metadata" Margin="4" Visibility="Visible" Panel.ZIndex="1">
+            <TextBlock Style="{StaticResource DropShadowLabel}" x:Name="ImageSizeIndicator" Text="Size: 1KB" />
+            <TextBlock Style="{StaticResource DropShadowLabel}" x:Name="ImageLastModifiedIndicator" Text="Last modified: 1KB" />
+            <TextBlock Style="{StaticResource DropShadowLabel}" x:Name="ImageDimensionsIndicator" Text="Dimensions: 1KB" />
+            <TextBlock Style="{StaticResource DropShadowLabel}" x:Name="ImageMetadataIndicator" Text="Metadata: 1KB" />
+        </StackPanel>
     </Grid>
 </Window>

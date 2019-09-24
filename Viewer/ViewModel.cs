@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
 namespace Viewer {
@@ -20,12 +21,18 @@ namespace Viewer {
         public List<string> Images {
             get => images;
             set {
-                if (images == value) {
+                if (images == value || value == null || value.Count == 0) {
                     return;
                 }
 
                 images = value;
-                CurrentImageIndex = 0;  // has the side effect of the NotifyPropertyChanges in CurrentImage::get
+                currentImageIndex = 0;  // has the side effect of the NotifyPropertyChanges in CurrentImage::get
+                NotifyPropertyChanged(nameof(Images));
+                NotifyPropertyChanged(nameof(CurrentImage));
+                NotifyPropertyChanged(nameof(CurrentImageIndex));
+                NotifyPropertyChanged(nameof(CurrentImageSource));
+                NotifyPropertyChanged(nameof(CurrentImageMetadata));
+                NotifyPropertyChanged(nameof(Title));
             }
         }
 
@@ -39,7 +46,10 @@ namespace Viewer {
                 }
 
                 currentImageIndex = ActualIndex(value);
+                NotifyPropertyChanged(nameof(CurrentImage));
+                NotifyPropertyChanged(nameof(CurrentImageIndex));
                 NotifyPropertyChanged(nameof(CurrentImageSource));
+                NotifyPropertyChanged(nameof(CurrentImageMetadata));
                 NotifyPropertyChanged(nameof(Title));
             }
         }
@@ -59,7 +69,8 @@ namespace Viewer {
             }
         }
 
-        public BitmapImage CurrentImageSource => GetBitmapImage(CurrentImageIndex);
+        public BitmapSource CurrentImageSource => GetBitmapSource(CurrentImageIndex);
+        public BitmapMetadata CurrentImageMetadata => GetBitmapMetadata(CurrentImageIndex);
 
 
         // INotifyPropertyChanged implementation
@@ -90,13 +101,25 @@ namespace Viewer {
         }
 
         // note: index must be valid!
-        private BitmapImage GetBitmapImage(int index) {
+        private BitmapSource GetBitmapSource(int index) {
             var file = images[index];
+
+            // this is faster than using a BitmapFrame
             var image = new BitmapImage();
             image.BeginInit();
             image.UriSource = new Uri(file);
             image.EndInit();
             return image;
+        }
+        
+        private BitmapMetadata GetBitmapMetadata(int index) {
+            var file = images[index];
+
+            try {
+                return (BitmapMetadata)BitmapFrame.Create(new Uri(file)).Metadata;
+            } catch (NotSupportedException) {
+                return null;
+            }
         }
 
         private bool IsImage(string path) {
