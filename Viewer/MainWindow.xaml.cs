@@ -63,37 +63,13 @@ namespace Viewer {
                 this.Left = 0;
             }
 
-            // args come from App, which is the command line arguments
-            this.viewModel.LoadImages(files);
+            Open(files);
         }
 
         private void ViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e) {
             if (e.PropertyName == nameof(this.viewModel.CurrentImage)) {
                 if (this.Metadata.Visibility == Visibility.Visible) {
-                    var info = new FileInfo(this.viewModel.CurrentImage);
-                    var metadata = this.viewModel.CurrentImageMetadata;
-
-                    this.ImageSizeIndicator.Text = string.Format("File size: {0} bytes", info.Length);
-                    this.ImageLastModifiedIndicator.Text = string.Format("Last modified: {0}", info.LastWriteTime);
-
-                    try {
-                        this.ImageDimensionsIndicator.Text = string.Format("Dimensions: {0}x{1}", this.viewModel.CurrentImageSource.PixelWidth, this.viewModel.CurrentImageSource.PixelHeight);
-                    } catch (NotSupportedException) {
-                        this.ImageDimensionsIndicator.Text = "This image could not be loaded";
-                    }
-
-                    if (metadata != null) {
-                        try {
-                            this.ImageMetadataIndicator.Text = string.Format(
-                                "Metadata: {0}, {1}, {2} {3}, {4}",
-                                metadata.Format, metadata.DateTaken, metadata.CameraManufacturer, metadata.CameraModel, metadata.ApplicationName
-                            );
-                        } catch (NotSupportedException) {
-                            this.ImageMetadataIndicator.Text = string.Format("Metadata: {0}", metadata.Format);
-                        }
-                    } else {
-                        this.ImageMetadataIndicator.Text = "";
-                    }
+                    UpdateMetadata();
                 }
             }
         }
@@ -166,6 +142,34 @@ namespace Viewer {
                 this.Metadata.Visibility = Visibility.Hidden;
             } else {
                 this.Metadata.Visibility = Visibility.Visible;
+                UpdateMetadata();
+            }
+        }
+
+        private void UpdateMetadata() {
+            var info = new FileInfo(this.viewModel.CurrentImage);
+            var metadata = this.viewModel.CurrentImageMetadata;
+
+            this.ImageSizeIndicator.Text = string.Format("File size: {0} bytes", info.Length);
+            this.ImageLastModifiedIndicator.Text = string.Format("Last modified: {0}", info.LastWriteTime);
+
+            try {
+                this.ImageDimensionsIndicator.Text = string.Format("Dimensions: {0}x{1}", this.viewModel.CurrentImageSource.PixelWidth, this.viewModel.CurrentImageSource.PixelHeight);
+            } catch (NotSupportedException) {
+                this.ImageDimensionsIndicator.Text = "This image could not be loaded";
+            }
+
+            if (metadata != null) {
+                try {
+                    this.ImageMetadataIndicator.Text = string.Format(
+                        "Metadata: {0}, {1}, {2} {3}, {4}",
+                        metadata.Format, metadata.DateTaken, metadata.CameraManufacturer, metadata.CameraModel, metadata.ApplicationName
+                    );
+                } catch (NotSupportedException) {
+                    this.ImageMetadataIndicator.Text = string.Format("Metadata: {0}", metadata.Format);
+                }
+            } else {
+                this.ImageMetadataIndicator.Text = "";
             }
         }
 
@@ -219,6 +223,18 @@ namespace Viewer {
             // quick and dirty; figure out how to use Window.InputBindings instead
             if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.Tab) {
                 ToggleMetadata();
+            }
+
+            if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.E) {
+                this.ContextMenu_ShowInExplorer(null, null);
+            }
+
+            if (e.Key == Key.Delete) {
+                this.ContextMenu_Delete(null, null);
+            }
+
+            if (e.Key == Key.Escape) {
+                this.ContextMenu_Exit(null, null);
             }
         }
 
