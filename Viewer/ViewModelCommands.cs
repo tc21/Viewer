@@ -49,7 +49,10 @@ namespace Viewer {
 
                             var target = (int)i;
 
-                            return (target >= 0 && target < this.Images.Count);
+                            // see ActualIndex(): it is designed to only work if target > -Images.Count
+                            // we could have made it work with any number, but you're probably doing something wrong if it
+                            // goes out of this range
+                            return (target > -this.Images.Count && target < this.Images.Count);
                         }
                     );
                 }

@@ -48,6 +48,8 @@
         <KeyBinding Key="Delete" Command="{Binding DeleteCommand}" />
         <KeyBinding Key="Esc" Command="{Binding ExitCommand}" />
         <KeyBinding Gesture="Ctrl+W" Command="{Binding ExitCommand}" />
+        <KeyBinding Gesture="Ctrl+OemOpenBrackets" Command="{Binding SeekCommand}" CommandParameter="0" />
+        <KeyBinding Gesture="Ctrl+OemCloseBrackets" Command="{Binding SeekCommand}" CommandParameter="-1" />
     </Window.InputBindings>
 
     <Grid>

@@ -116,6 +116,7 @@ namespace Viewer {
             LoadImages(files.Select(e => e.FullName));
         }
 
+        // for a relative-to-current-image index, just do CurrentImageIndex += ...
         private int ActualIndex(int index) {
             return (index + images.Count) % images.Count;
         }
