@@ -125,16 +125,16 @@ namespace Viewer {
             }
         }
 
-        private ICommand exitCommand;
-        public ICommand ExitCommand {
+        private ICommand closeWindowCommand;
+        public ICommand CloseWindowCommand {
             get {
-                if (this.exitCommand == null) {
-                    this.exitCommand = new Commands.RelayCommand(
-                        o => Application.Current.Shutdown()
+                if (this.closeWindowCommand == null) {
+                    this.closeWindowCommand = new Commands.RelayCommand(
+                        _ => this.window.Close()
                     );
                 }
 
-                return this.exitCommand;
+                return this.closeWindowCommand;
             }
         }
 

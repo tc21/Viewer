@@ -12,6 +12,7 @@ using System.Windows.Media.Imaging;
 
 namespace Viewer {
     partial class ViewModel : INotifyPropertyChanged {
+        private readonly MainWindow window;
 
         public readonly string[] ImageExtensions = {
             ".bmp", ".gif", ".heic", ".heif", ".j2k", ".jfi", ".jfif", ".jif", ".jp2", ".jpe", ".jpeg", ".jpf",
@@ -97,6 +98,10 @@ namespace Viewer {
         public event PropertyChangedEventHandler PropertyChanged;
         private void NotifyPropertyChanged(string propertyName) {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        public ViewModel(MainWindow window) {
+            this.window = window;
         }
 
         // If you use this, it is your responsibility to ensure all paths are valid

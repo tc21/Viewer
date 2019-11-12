@@ -40,11 +40,12 @@ namespace Viewer {
         public string CurrentImage => this.viewModel.CurrentImage;
         public int CurrentImageIndex => this.viewModel.CurrentImageIndex;
 
-        private readonly ViewModel viewModel = new ViewModel();
+        private readonly ViewModel viewModel;
 
         public MainWindow(string[] files) {
             InitializeComponent();
 
+            this.viewModel = new ViewModel(this);
             this.DataContext = this.viewModel;
             this.viewModel.PropertyChanged += this.ViewModel_PropertyChanged;
 
@@ -136,6 +137,8 @@ namespace Viewer {
             foreach (var item in lower) {
                 menuItems.Add(item);
             }
+
+            this.ContextMenu.DataContext = this.viewModel;
         }
 
         private void UpdateMetadata() {

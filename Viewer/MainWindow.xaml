@@ -1,5 +1,4 @@
 ﻿<Window x:Class="Viewer.MainWindow"
-        x:Name="ImageViewerWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -21,7 +20,7 @@
         </x:Array>
         <x:Array Type="{x:Type sys:Object}" x:Key="LowerContextMenu">
             <MenuItem Header="Delete" Command="{Binding DeleteCommand}" InputGestureText="Del" />
-            <MenuItem Header="Exit" Command="{Binding ExitCommand}" InputGestureText="Esc, Ctrl+W"/>
+            <MenuItem Header="Exit" Command="{Binding CloseWindowCommand}" InputGestureText="Esc, Ctrl+W"/>
         </x:Array>
 
         <Style x:Key="DropShadowLabel" TargetType="TextBlock">
@@ -46,14 +45,13 @@
         <KeyBinding Gesture="Ctrl+E" Command="{Binding ShowInExplorerCommand}" />
         <KeyBinding Gesture="Ctrl+Tab" Command="{Binding ToggleMetadataCommand}" />
         <KeyBinding Key="Delete" Command="{Binding DeleteCommand}" />
-        <KeyBinding Key="Esc" Command="{Binding ExitCommand}" />
-        <KeyBinding Gesture="Ctrl+W" Command="{Binding ExitCommand}" />
+        <KeyBinding Key="Esc" Command="{Binding CloseWindowCommand}" />
+        <KeyBinding Gesture="Ctrl+W" Command="{Binding CloseWindowCommand}" />
         <KeyBinding Gesture="Ctrl+OemOpenBrackets" Command="{Binding SeekCommand}" CommandParameter="0" />
         <KeyBinding Gesture="Ctrl+OemCloseBrackets" Command="{Binding SeekCommand}" CommandParameter="-1" />
     </Window.InputBindings>
 
     <Grid>
-
         <Image x:Name="MainImage" Source="{Binding CurrentImageSource}" RenderOptions.BitmapScalingMode="HighQuality"/>
 
         <StackPanel x:Name="Metadata" Margin="4" Visibility="{Binding MetadataVisibility, Mode=TwoWay}" Panel.ZIndex="1">
