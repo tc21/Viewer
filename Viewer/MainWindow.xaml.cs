@@ -67,8 +67,9 @@ namespace Viewer {
         }
 
         private void ViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e) {
-            if (e.PropertyName == nameof(this.viewModel.CurrentImage)) {
-                if (this.Metadata.Visibility == Visibility.Visible) {
+            if (e.PropertyName == nameof(this.viewModel.CurrentImage)
+                || e.PropertyName == nameof(this.viewModel.MetadataVisibility)) {
+                if (this.viewModel.MetadataVisibility == Visibility.Visible) {
                     UpdateMetadata();
                 }
             }
@@ -137,16 +138,12 @@ namespace Viewer {
             }
         }
 
-        private void ToggleMetadata() {
-            if (this.Metadata.Visibility == Visibility.Visible) {
-                this.Metadata.Visibility = Visibility.Hidden;
-            } else {
-                this.Metadata.Visibility = Visibility.Visible;
-                UpdateMetadata();
-            }
-        }
-
         private void UpdateMetadata() {
+            // TODO: eventually this should be moved to the xaml
+            if (this.viewModel.CurrentImage == null) {
+                return;
+            }
+
             var info = new FileInfo(this.viewModel.CurrentImage);
             var metadata = this.viewModel.CurrentImageMetadata;
 
@@ -182,9 +179,9 @@ namespace Viewer {
 
         private void Window_MouseWheel(object sender, MouseWheelEventArgs e) {
             if (e.Delta > 0) { // This means scrolled up
-                this.viewModel.CurrentImageIndex -= 1;
+                this.viewModel.SeekRelativeCommand.Execute(-1);
             } else {
-                this.viewModel.CurrentImageIndex += 1;
+                this.viewModel.SeekRelativeCommand.Execute(1);
             }
         }
 
@@ -202,64 +199,6 @@ namespace Viewer {
             }
 
             Properties.Settings.Default.MetadataVisible = this.Metadata.Visibility == Visibility.Visible;
-        }
-
-        private void Window_MouseUp(object sender, MouseButtonEventArgs e) {
-            this.viewModel.CurrentImageIndex += 1;
-        }
-
-        private void Window_KeyDown(object sender, KeyEventArgs e) {
-            // navigation 
-            if (e.Key == Key.Right || e.Key == Key.Down) {
-                this.viewModel.CurrentImageIndex += 1;
-            }
-
-            if (e.Key == Key.Left || e.Key == Key.Up) {
-                this.viewModel.CurrentImageIndex -= 1;
-            }
-        }
-
-        private void Window_KeyUp(object sender, KeyEventArgs e) {
-            // quick and dirty; figure out how to use Window.InputBindings instead
-            if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.Tab) {
-                ToggleMetadata();
-            }
-
-            if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.E) {
-                this.ContextMenu_ShowInExplorer(null, null);
-            }
-
-            if (e.Key == Key.Delete) {
-                this.ContextMenu_Delete(null, null);
-            }
-
-            if (e.Key == Key.Escape) {
-                this.ContextMenu_Exit(null, null);
-            }
-        }
-
-        private void ContextMenu_ShowInExplorer(object sender, RoutedEventArgs e) {
-            var proc = new Process();
-            proc.StartInfo.FileName = "explorer.exe";
-            proc.StartInfo.Arguments = string.Format("/select,\"{0}\"", this.viewModel.CurrentImage);
-            proc.Start();
-        }
-
-        private void ContextMenu_Delete(object sender, RoutedEventArgs e) {
-            // this doesn't work currently because the image is still loaded and the file handle is still held!
-            var response = MessageBox.Show("Are you sure you want to move this file to the Recycle Bin?", "Confirm file deletion", MessageBoxButton.YesNo);
-            if (response == MessageBoxResult.Yes) {
-                var currentImage = this.viewModel.CurrentImage;
-                FileSystem.DeleteFile(currentImage, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
-
-                this.viewModel.Images.Remove(currentImage);
-                // this refreshes the view model; maybe we should have to call a ViewModel.RemoveImage instead?
-                this.viewModel.CurrentImageIndex = this.viewModel.CurrentImageIndex; 
-            }
-        }
-
-        private void ContextMenu_Exit(object sender, RoutedEventArgs e) {
-            this.Close();
         }
     }
 }

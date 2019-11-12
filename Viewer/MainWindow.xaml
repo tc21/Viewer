@@ -1,4 +1,5 @@
 ﻿<Window x:Class="Viewer.MainWindow"
+        x:Name="ImageViewerWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -13,17 +14,14 @@
         Drop="Window_Drop"
         MouseWheel="Window_MouseWheel"
         Closing="Window_Closing"
-        MouseLeftButtonUp="Window_MouseUp"
-        KeyDown="Window_KeyDown"
-        KeyUp="Window_KeyUp"
         >
     <Window.Resources>
         <x:Array Type="{x:Type sys:Object}" x:Key="UpperContextMenu">
-            <MenuItem Header="Show in Explorer" Click="ContextMenu_ShowInExplorer" />
+            <MenuItem Header="Show in Explorer" Command="{Binding ShowInExplorerCommand}" InputGestureText="Ctrl+E" />
         </x:Array>
         <x:Array Type="{x:Type sys:Object}" x:Key="LowerContextMenu">
-            <MenuItem Header="Delete" Click="ContextMenu_Delete" IsEnabled="False" />
-            <MenuItem Header="Exit" Click="ContextMenu_Exit" />
+            <MenuItem Header="Delete" Command="{Binding DeleteCommand}" InputGestureText="Del" />
+            <MenuItem Header="Exit" Command="{Binding ExitCommand}" InputGestureText="Esc, Ctrl+W"/>
         </x:Array>
 
         <Style x:Key="DropShadowLabel" TargetType="TextBlock">
@@ -39,14 +37,28 @@
         </Style>
     </Window.Resources>
 
+    <Window.InputBindings>
+        <!-- <KeyBinding Gesture="Ctrl+T" Command="{Binding TestCommand}" /> -->
+        <KeyBinding Gesture="Ctrl+T" Command="{Binding TestCommand}" />
+        <KeyBinding Key="Right" Command="{Binding SeekRelativeCommand}" CommandParameter="1" />
+        <KeyBinding Key="Left" Command="{Binding SeekRelativeCommand}" CommandParameter="-1" />
+        <MouseBinding MouseAction="LeftClick" Command="{Binding SeekRelativeCommand}" CommandParameter="1" />
+        <KeyBinding Gesture="Ctrl+E" Command="{Binding ShowInExplorerCommand}" />
+        <KeyBinding Gesture="Ctrl+Tab" Command="{Binding ToggleMetadataCommand}" />
+        <KeyBinding Key="Delete" Command="{Binding DeleteCommand}" />
+        <KeyBinding Key="Esc" Command="{Binding ExitCommand}" />
+        <KeyBinding Gesture="Ctrl+W" Command="{Binding ExitCommand}" />
+    </Window.InputBindings>
+
     <Grid>
+
         <Image x:Name="MainImage" Source="{Binding CurrentImageSource}" RenderOptions.BitmapScalingMode="HighQuality"/>
-        
-        <StackPanel x:Name="Metadata" Margin="4" Visibility="Visible" Panel.ZIndex="1">
-            <TextBlock Style="{StaticResource DropShadowLabel}" x:Name="ImageSizeIndicator" Text="Size: 1KB" />
-            <TextBlock Style="{StaticResource DropShadowLabel}" x:Name="ImageLastModifiedIndicator" Text="Last modified: 1KB" />
-            <TextBlock Style="{StaticResource DropShadowLabel}" x:Name="ImageDimensionsIndicator" Text="Dimensions: 1KB" />
-            <TextBlock Style="{StaticResource DropShadowLabel}" x:Name="ImageMetadataIndicator" Text="Metadata: 1KB" />
+
+        <StackPanel x:Name="Metadata" Margin="4" Visibility="{Binding MetadataVisibility, Mode=TwoWay}" Panel.ZIndex="1">
+            <TextBlock Style="{StaticResource DropShadowLabel}" x:Name="ImageSizeIndicator" Text="No images currently open" />
+            <TextBlock Style="{StaticResource DropShadowLabel}" x:Name="ImageLastModifiedIndicator" />
+            <TextBlock Style="{StaticResource DropShadowLabel}" x:Name="ImageDimensionsIndicator" />
+            <TextBlock Style="{StaticResource DropShadowLabel}" x:Name="ImageMetadataIndicator" />
         </StackPanel>
     </Grid>
 </Window>

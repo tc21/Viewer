@@ -5,11 +5,13 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
 namespace Viewer {
-    class ViewModel : INotifyPropertyChanged {
+    partial class ViewModel : INotifyPropertyChanged {
 
         public readonly string[] ImageExtensions = {
             ".bmp", ".gif", ".heic", ".heif", ".j2k", ".jfi", ".jfif", ".jif", ".jp2", ".jpe", ".jpeg", ".jpf",
@@ -36,7 +38,6 @@ namespace Viewer {
             }
         }
 
-
         private int currentImageIndex;
         public int CurrentImageIndex {
             get => currentImageIndex;
@@ -54,8 +55,28 @@ namespace Viewer {
             }
         }
 
-        public string CurrentImage => Images[CurrentImageIndex];
+        private Visibility metadataVisibility;
+        public Visibility MetadataVisibility {
+            get => metadataVisibility;
+            set {
+                if (metadataVisibility == value) {
+                    return;
+                }
 
+                metadataVisibility = value;
+                NotifyPropertyChanged(nameof(MetadataVisibility));
+            }
+        }
+
+        public string CurrentImage {
+            get {
+                if (CurrentImageIndex < Images.Count) {
+                    return Images[CurrentImageIndex];
+                }
+
+                return null;
+            }
+        }
 
         public string Title {
             get {
@@ -71,7 +92,6 @@ namespace Viewer {
 
         public BitmapSource CurrentImageSource => GetBitmapSource(CurrentImageIndex);
         public BitmapMetadata CurrentImageMetadata => GetBitmapMetadata(CurrentImageIndex);
-
 
         // INotifyPropertyChanged implementation
         public event PropertyChangedEventHandler PropertyChanged;
